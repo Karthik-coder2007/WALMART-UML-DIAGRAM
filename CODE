@@ -1,0 +1,64 @@
+from graphviz import Digraph
+
+def create_mindmap(title, branches, colors, output_file):
+    dot = Digraph(comment=title, format='png')
+    dot.attr(bgcolor='white', rankdir='TB', splines='true', nodesep='0.8', ranksep='0.8')
+
+    # Central node
+    dot.node("Center", title, shape="circle", style="filled", fillcolor="#FFD700",
+             fontsize="22", fontcolor="black", penwidth="2")
+
+    color_index = 0
+    for branch, items in branches.items():
+        color = colors[color_index % len(colors)]
+        color_index += 1
+
+        dot.node(branch, branch, shape="ellipse", style="filled",
+                 fillcolor=color, fontsize="18", fontcolor="black", penwidth="1.5")
+        dot.edge("Center", branch, color=color, penwidth="2")
+
+        for item in items:
+            node_id = f"{branch}_{item}"
+            dot.node(node_id, item, shape="box", style="rounded,filled",
+                     fillcolor="#FFFFFF", fontsize="12", fontcolor="black", penwidth="1")
+            dot.edge(branch, node_id, color=color, style="solid")
+
+    dot.render(output_file, cleanup=True)
+    print(f"Saved: {output_file}.png")
+
+
+# Colors for branches
+colors = ["#FF9999", "#99FF99", "#9999FF", "#FFCC99", "#CC99FF", "#66CCCC"]
+
+# Sequence Diagram Mind Map
+sequence_branches = {
+    "Customer": ["Search/Browse", "Add to Cart", "Checkout"],
+    "Walmart Website": ["Display Products", "Request Payment", "Create Order"],
+    "Shopping Cart": ["Update Cart"],
+    "Payment Gateway": ["Process Payment", "Confirm Payment"],
+    "Order System": ["Register Order", "Assign Delivery"],
+    "Delivery Person": ["Deliver Order to Customer"]
+}
+create_mindmap("Walmart Purchase Sequence", sequence_branches, colors, "walmart_sequence_mindmap")
+
+# Use Case Mind Map
+usecase_branches = {
+    "Customer": ["Register Account", "Login", "Browse Products", "Add to Cart", "Place Order", "Track Order", "Make Payment", "Manage Account"],
+    "Admin": ["Manage Products", "Manage Orders", "Generate Reports"],
+    "Delivery Person": ["Deliver Order"],
+    "Payment Gateway": ["Process Payment"]
+}
+create_mindmap("Walmart Use Cases", usecase_branches, colors, "walmart_usecase_mindmap")
+
+# Class Diagram Mind Map
+class_branches = {
+    "Customer": ["id: int", "password: string", "contactInfo: string", "addAddress()", "deleteAddress()", "changeEmail()", "changePassword()", "emptyCart()", "updateCart()", "purchase()", "updateStatus()"],
+    "Address": ["street: string", "number: int", "zipcode: string", "city: string", "country: string", "phone: string"],
+    "ShoppingCart": ["update(items)", "remove(items)", "purchase()"],
+    "Item": ["quantity: int", "price: double"],
+    "Order": ["orderId: int", "orderDate: Date", "sum: double", "updateOrder(status)", "createBillingInformation()"],
+    "Bill": ["issueDate: Date", "dueDate: Date", "sum: double"],
+    "Product": ["id: int", "description: string", "price: double", "manufacturer: string"],
+    "Enumerations": ["CustomerStatus: NEW, ACTIVE, BLOCKED, RETIRED", "OrderStatus: PROCESSING, SHIPPING, DELIVERED, CANCELED"]
+}
+create_mindmap("Walmart Class Diagram", class_branches, colors, "walmart_class_mindmap")
